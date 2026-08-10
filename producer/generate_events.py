@@ -1,0 +1,61 @@
+from faker import Faker
+import random
+import time
+import json
+
+fake = Faker()
+
+EVENTS = ["play_song", "create_new_playlist", "add_song_to_playlist", "remove_song_from_playlist", "delete_playlist"]
+SUBSCRIPTION_TYPES = ["free", "premium"]
+
+USER_IDS = [fake.uuid4() for _ in range(1000)]
+SONG_IDS = [fake.uuid4() for _ in range(10000)]
+PLAYLIST_IDS = [fake.uuid4() for _ in range(1000)]
+
+def build_properties(event_type: str) -> dict:
+    if event_type == "play_song":
+        return {
+            "song_id": random.choice(SONG_IDS)
+        }
+    elif event_type == "create_new_playlist":
+        return {
+            "playlist_name": fake.word()
+        }
+    elif event_type in ["add_song_to_playlist", "remove_song_from_playlist"]:
+        return {
+            "playlist_id": random.choice(PLAYLIST_IDS),
+            "song_id": random.choice(SONG_IDS)
+        }
+    elif event_type == "delete_playlist":
+        return {
+            "playlist_id": random.choice(PLAYLIST_IDS)
+        }
+
+sleep_time = 3
+
+def generate_batch_events(events_per_timeframe: int):
+    events = []
+    for _ in range(events_per_timeframe):
+        event_type = random.choice(EVENTS)
+        payload = {
+            "event_id": fake.uuid4(),
+            "event_type": event_type, 
+            "event_timestamp": fake.date_time_this_year().isoformat(),
+            "user_id": random.choice(USER_IDS),
+            "user_country": fake.country(),
+            "user_subscription_type": random.choice(SUBSCRIPTION_TYPES),
+            "event_properties": build_properties(event_type)
+        }
+        events.append(payload)
+    
+    return events
+    
+def main():
+    while True:
+        num_events = random.randint(0, 5)
+        print(num_events)
+        print(json.dumps(generate_batch_events(num_events)))
+        time.sleep(sleep_time)
+
+if __name__ == "__main__":
+    main()
