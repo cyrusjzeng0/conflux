@@ -9,8 +9,8 @@ EVENTS = ["play_song", "create_new_playlist", "add_song_to_playlist", "remove_so
 SUBSCRIPTION_TYPES = ["free", "premium"]
 
 USER_IDS = [fake.uuid4() for _ in range(1000)]
-SONG_IDS = [fake.uuid4() for _ in range(10000)]
-PLAYLIST_IDS = [fake.uuid4() for _ in range(1000)]
+SONG_IDS = [fake.uuid4() for _ in range(12000)]
+PLAYLIST_IDS = [fake.uuid4() for _ in range(2000)]
 
 def build_properties(event_type: str) -> dict:
     if event_type == "play_song":
@@ -31,8 +31,6 @@ def build_properties(event_type: str) -> dict:
             "playlist_id": random.choice(PLAYLIST_IDS)
         }
 
-sleep_time = 3
-
 def generate_batch_events(events_per_timeframe: int):
     events = []
     for _ in range(events_per_timeframe):
@@ -50,12 +48,14 @@ def generate_batch_events(events_per_timeframe: int):
     
     return events
     
+sleep_time = 0.5
+
 def main():
     while True:
         num_events = random.randint(0, 5)
-        print(num_events)
+        #print(num_events)
         print(json.dumps(generate_batch_events(num_events)))
         time.sleep(sleep_time)
 
 if __name__ == "__main__":
-    main()
+    main() # run with python3 -m producer.generate-events
