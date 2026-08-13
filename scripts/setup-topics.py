@@ -11,7 +11,6 @@ def clear_topics(admin_client, topic_name):
     if to_delete:
         fs = admin_client.delete_topics(to_delete)
         for name, f in fs.items():
-            print(name, f)
             try:
                 f.result()
                 print(f"deleted {name}")
