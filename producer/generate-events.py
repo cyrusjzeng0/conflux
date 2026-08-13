@@ -5,7 +5,7 @@ import json
 
 fake = Faker()
 
-EVENTS = ["play_song", "create_new_playlist", "add_song_to_playlist", "remove_song_from_playlist", "delete_playlist"]
+EVENTS = ["play_song", "song_liked", "song_unliked", "create_new_playlist", "add_song_to_playlist", "remove_song_from_playlist", "delete_playlist"]
 SUBSCRIPTION_TYPES = ["free", "premium"]
 
 USER_IDS = [fake.uuid4() for _ in range(1000)]
@@ -13,7 +13,7 @@ SONG_IDS = [fake.uuid4() for _ in range(12000)]
 PLAYLIST_IDS = [fake.uuid4() for _ in range(2000)]
 
 def build_properties(event_type: str) -> dict:
-    if event_type == "play_song":
+    if event_type in ["play_song", "song_liked", "song_unliked"]:
         return {
             "song_id": random.choice(SONG_IDS)
         }
@@ -53,7 +53,6 @@ sleep_time = 0.5
 def main():
     while True:
         num_events = random.randint(0, 5)
-        #print(num_events)
         print(json.dumps(generate_batch_events(num_events)))
         time.sleep(sleep_time)
 
