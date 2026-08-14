@@ -39,4 +39,4 @@ def main():
     create_topic(admin_client, topic_name)
             
 if __name__ == "__main__":
-    main() # python -m scripts.setup-topics
+    main() # python scripts/setup_topics.py

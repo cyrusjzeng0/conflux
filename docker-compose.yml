@@ -1,17 +1,17 @@
-services:
+services: # what programs to run
   kafka:
     image: apache/kafka:3.8.0
     container_name: conflux-kafka
-    ports:
+    ports: # acts as input port from localhost to container
       - "9092:9092"
     environment:
       KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,EXTERNAL://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_PROCESS_ROLES: broker, controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092, CONTROLLER://0.0.0.0:9093, EXTERNAL://0.0.0.0:9092 # incoming connections from these ports
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092, EXTERNAL://localhost:9092 # this is for data clients (brokers)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT, PLAINTEXT:PLAINTEXT, EXTERNAL:PLAINTEXT # PLAINTEXT (no security) protocol for all listeners (CONTROLLER, PLAINTEXT, EXTERNAL)
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093 # node ID 1 is a member of voting quorum; kafka:9093 is the controller listener (KRaft). this is for metadata management (controllers)
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -22,9 +22,9 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:24.8
     container_name: conflux-clickhouse
-    ports:
-      - "8123:8123"
-      - "9000:9000"
+    ports: # act as output ports from container to localhost
+      - "8123:8123" # HTTP; sends standard SQL queries to Clickhouse
+      - "9000:9000" # TCP; faster than HTTP for bulk inserts / DB ops
     volumes:
       - clickhouse-data:/var/lib/clickhouse
     ulimits:
@@ -32,6 +32,9 @@ services:
         soft: 262144
         hard: 262144
 
-volumes:
+volumes: # named disks for persistent data
   kafka-data:
   clickhouse-data:
+
+# KRaft = metadata management for kafka
+# client-server relationship; client (clickhouse) sends requests to server (kafka), server sends responses to client. only server needs to declare which port it listens on
